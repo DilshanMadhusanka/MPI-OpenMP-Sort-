@@ -1,0 +1,21 @@
+
+
+
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/usr/include",
+        "/usr/include/x86_64-linux-gnu/mpich"
+      ],
+      "defines": ["MPICH_SKIP_MPICXX", "OMPI_SKIP_MPICXX"],
+      "compilerPath": "/usr/bin/mpicc",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "linux-gcc-x64"
+    }
+  ],
+  "version": 4
+}
