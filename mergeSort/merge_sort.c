@@ -11,6 +11,9 @@ void merge(int arr[], int l, int m, int r) {
     int n1 = m - l + 1;
     int n2 = r - m;
 
+
+    // The malloc function in C is used to dynamically allocate memory at runtime.
+
     int *L = (int *)malloc(n1 * sizeof(int));
     int *R = (int *)malloc(n2 * sizeof(int));
 
@@ -37,6 +40,8 @@ void merge(int arr[], int l, int m, int r) {
     while (j < n2) {
         arr[k++] = R[j++];
     }
+
+    //Always use free() to deallocate memory allocated with malloc.
 
     free(L);
     free(R);
@@ -73,8 +78,12 @@ int main() {
         scanf("%d", &arr[i]);
     }
 
+
+    // start stores the time before calling mergeSort().
     clock_t start = clock();
     mergeSort(arr, 0, n - 1);
+
+    //end stores the time after sorting is done.
     clock_t end = clock();
 
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -82,7 +91,6 @@ int main() {
     printf("Sorted array:\n");
     printArray(arr, n);
 
-   // printf("Execution time: %.6f seconds\n", time_taken);
     printf("SEQUENTIAL %.6f\n", time_taken);
     free(arr);
     return 0;
