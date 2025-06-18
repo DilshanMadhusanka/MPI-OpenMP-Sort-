@@ -1,7 +1,4 @@
-/*
- * File: merge_sort_openmp.c
- * Description: Parallel Merge Sort using OpenMP with user input
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -88,15 +85,18 @@ int main() {
     double start = omp_get_wtime();
     #pragma omp parallel
     {
+        //ensures that only one thread begins the recursive sorting call
         #pragma omp single
-        parallelMergeSort(arr, 0, n - 1, 4);
+        parallelMergeSort(arr, 0, n - 1, 4);  
     }
     double end = omp_get_wtime();
 
     printf("Sorted array:\n");
     printArray(arr, n);
-   // printf("Execution time: %f seconds\n", end - start);
     printf("OPENMP %.6f\n", end - start);
     free(arr);
     return 0;
 }
+
+
+//gcc -fopenmp merge_sort_openmp.c -o merge_sort_openmp

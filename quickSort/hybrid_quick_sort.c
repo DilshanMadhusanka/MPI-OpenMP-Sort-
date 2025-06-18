@@ -60,7 +60,6 @@ int main(int argc, char* argv[]) {
         printf("Enter number of elements: ");
         scanf("%d", &n);
 
-        // Generate random data on root process
         data = (int*)malloc(n * sizeof(int));
         srand(time(NULL));
         for (int i = 0; i < n; i++) {
@@ -70,18 +69,13 @@ int main(int argc, char* argv[]) {
         start_time = MPI_Wtime();
     }
 
-    // Broadcast the size to all processes
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    // Calculate local size
     int local_n = n / size;
     local_data = (int*)malloc(local_n * sizeof(int));
 
-    // Scatter the data to all processes
     MPI_Scatter(data, local_n, MPI_INT, local_data, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
-    // Each process sorts its local data using hybrid Quick Sort
-    // Using 4 levels of OpenMP parallelism (can be adjusted)
     #pragma omp parallel
     {
         #pragma omp single

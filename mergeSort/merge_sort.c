@@ -1,7 +1,4 @@
-/*
- * File: merge_sort.c
- * Description: Sequential Merge Sort implementation with user input and execution time measurement
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -19,9 +16,12 @@ void merge(int arr[], int l, int m, int r) {
     for (j = 0; j < n2; j++)
         R[j] = arr[m + 1 + j];
 
+
     i = 0;
     j = 0;
     k = l;
+
+    // Compare elements and merge them in sorted order
     while (i < n1 && j < n2) {
         if (L[i] <= R[j]) {
             arr[k++] = L[i++];
@@ -37,6 +37,7 @@ void merge(int arr[], int l, int m, int r) {
     while (j < n2) {
         arr[k++] = R[j++];
     }
+
 
     free(L);
     free(R);
@@ -82,7 +83,6 @@ int main() {
     printf("Sorted array:\n");
     printArray(arr, n);
 
-   // printf("Execution time: %.6f seconds\n", time_taken);
     printf("SEQUENTIAL %.6f\n", time_taken);
     free(arr);
     return 0;

@@ -1,7 +1,4 @@
-/*
- * File: merge_sort_mpi.c
- * Description: Parallel Merge Sort using MPI with user input and execution time
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
@@ -22,7 +19,7 @@ void merge(int *arr, int l, int m, int r) {
     while (i < n1 && j < n2) {
         arr[k++] = (L[i] <= R[j]) ? L[i++] : R[j++];
     }
-
+    
     while (i < n1) arr[k++] = L[i++];
     while (j < n2) arr[k++] = R[j++];
 
@@ -40,13 +37,15 @@ void mergeSort(int *arr, int l, int r) {
 }
 
 int main(int argc, char *argv[]) {
-    int rank, size, n, *data = NULL;
-    int *sub_data, *sorted = NULL;
+    int rank, size, n;
+    int *data = NULL;     // Full data array 
+    int *sub_data = NULL; // Subarray for each process
+    int *sorted = NULL;   // Final sorted array 
     double start_time, end_time;
 
-    MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Init(&argc, &argv);                   // Initialize MPI environment
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);     // Get current process rank
+    MPI_Comm_size(MPI_COMM_WORLD, &size);     // Get total number of processes
 
     if (rank == 0) {
         printf("Enter number of elements: ");
@@ -63,43 +62,55 @@ int main(int argc, char *argv[]) {
             scanf("%d", &data[i]);
         }
 
-        start_time = MPI_Wtime();  // Start timing at rank 0
+        start_time = MPI_Wtime();  
     }
 
+    // Broadcast the size of the array to all processes
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     int local_n = n / size;
+
+    // Allocate local subarray for each process
     sub_data = (int *)malloc(local_n * sizeof(int));
     if (sub_data == NULL) {
         printf("Rank %d: Memory allocation failed!\n", rank);
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
+    //Distributes equal chunks of the array from rank 0 to all ranks.
     MPI_Scatter(data, local_n, MPI_INT, sub_data, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
     mergeSort(sub_data, 0, local_n - 1);
 
     if (rank == 0)
-        sorted = (int *)malloc(n * sizeof(int));
+        sorted = (int *)malloc(n * sizeof(int));  
 
+    //Collects sorted chunks from all ranks back to rank 0.
     MPI_Gather(sub_data, local_n, MPI_INT, sorted, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
-        mergeSort(sorted, 0, n - 1); // Final sort
-        end_time = MPI_Wtime();     // End timing
+        mergeSort(sorted, 0, n - 1);
+
+        end_time = MPI_Wtime();  
 
         printf("Sorted array:\n");
+
         for (int i = 0; i < n; i++)
-            printf("%d ", sorted[i]);
+        printf("%d ", sorted[i]);
         printf("\n");
 
-       //printf("Execution time: %.6f seconds\n", end_time - start_time);
         printf("MPI %.6f\n", end_time - start_time);
+
         free(data);
         free(sorted);
     }
 
     free(sub_data);
-    MPI_Finalize();
+    MPI_Finalize();  
     return 0;
 }
+
+
+// mpicc merge_sort_mpi.c -o merge_sort_mpi
+
+
