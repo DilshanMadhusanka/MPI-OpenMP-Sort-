@@ -1,7 +1,4 @@
-/*
- * File: quick_sort_mpi.c
- * Description: Parallel Quick Sort using MPI with user input and execution time measurement
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
@@ -71,6 +68,7 @@ int main(int argc, char *argv[]) {
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
+    //Distributes equal chunks of the array from rank 0 to all ranks.
     MPI_Scatter(data, local_n, MPI_INT, local_data, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
     quickSort(local_data, 0, local_n - 1);
@@ -78,6 +76,7 @@ int main(int argc, char *argv[]) {
     if (rank == 0)
         sorted = (int *)malloc(n * sizeof(int));
 
+    //Collects sorted chunks from all ranks back to rank 0.
     MPI_Gather(local_data, local_n, MPI_INT, sorted, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
@@ -86,7 +85,7 @@ int main(int argc, char *argv[]) {
 
         printf("Sorted array:\n");
         for (int i = 0; i < n; i++)
-            printf("%d ", sorted[i]);
+        printf("%d ", sorted[i]);
         printf("\n");
 
         printf("Execution time: %.6f seconds\n", end_time - start_time);

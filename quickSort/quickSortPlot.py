@@ -1,7 +1,7 @@
-import subprocess
+import subprocess  # Used to run external commands or programs from Python 
 import matplotlib.pyplot as plt
-import os
-from collections import defaultdict
+import os # Interact with the operating system (Check file paths, create/remove files, navigate directories)
+from collections import defaultdict # Automatically initialize dictionary lists or counters
 
 def get_user_input():
     """Get input size and elements from user"""

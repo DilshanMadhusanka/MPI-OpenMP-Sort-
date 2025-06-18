@@ -4,16 +4,14 @@
 #include <omp.h>
 #include <time.h>
 
-// Function to merge two sorted subarrays arr[l..m] and arr[m+1..r]
 void merge(int arr[], int l, int m, int r) {
     int i, j, k;
     int n1 = m - l + 1;
     int n2 = r - m;
 
-    int *L = (int *)malloc(n1 * sizeof(int)); // Temporary array for left half
-    int *R = (int *)malloc(n2 * sizeof(int)); // Temporary array for right half
+    int *L = (int *)malloc(n1 * sizeof(int)); 
+    int *R = (int *)malloc(n2 * sizeof(int)); 
 
-    // Copy data to temporary arrays L[] and R[]
     for (i = 0; i < n1; i++)
         L[i] = arr[l + i];
     for (j = 0; j < n2; j++)
@@ -21,7 +19,6 @@ void merge(int arr[], int l, int m, int r) {
 
     i = 0; j = 0; k = l;
 
-    // Merge the temporary arrays back into arr[l..r]
     while (i < n1 && j < n2) {
         if (L[i] <= R[j]) {
             arr[k++] = L[i++];
@@ -30,10 +27,8 @@ void merge(int arr[], int l, int m, int r) {
         }
     }
 
-    // Copy remaining elements of L[], if any
     while (i < n1) arr[k++] = L[i++];
 
-    // Copy remaining elements of R[], if any
     while (j < n2) arr[k++] = R[j++];
 
     free(L);
@@ -46,7 +41,6 @@ void parallelMergeSort(int arr[], int l, int r, int depth) {
         int m = l + (r - l) / 2;
 
         if (depth <= 0) {
-            // Sequential recursive calls once max parallel depth is reached
             parallelMergeSort(arr, l, m, 0);
             parallelMergeSort(arr, m + 1, r, 0);
         } else {
@@ -70,7 +64,6 @@ int main(int argc, char *argv[]) {
     int *sub_data, *sorted = NULL;
     double start_time, end_time;
 
-    // Initialize MPI environment
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);  // Get process rank
     MPI_Comm_size(MPI_COMM_WORLD, &size);  // Get total number of processes
@@ -86,41 +79,40 @@ int main(int argc, char *argv[]) {
             scanf("%d", &data[i]);
         }
 
-        start_time = MPI_Wtime();  // Start timing on rank 0
+        start_time = MPI_Wtime(); 
     }
 
     // Broadcast the number of elements to all processes
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    int local_n = n / size;  // Number of elements per process (assumes divisible)
+    int local_n = n / size;  // Number of elements per process 
     sub_data = (int *)malloc(local_n * sizeof(int));
 
-    // Scatter chunks of the array to all processes
+    //Distributes equal chunks of the array from rank 0 to all ranks.
     MPI_Scatter(data, local_n, MPI_INT, sub_data, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
     // Each process sorts its chunk in parallel using OpenMP
     #pragma omp parallel
     {
         #pragma omp single
-        parallelMergeSort(sub_data, 0, local_n - 1, 4); // depth = 4 controls OpenMP recursion depth
+        parallelMergeSort(sub_data, 0, local_n - 1, 4); 
     }
 
     if (rank == 0) {
-        sorted = (int *)malloc(n * sizeof(int)); // Allocate array for gathered results
+        sorted = (int *)malloc(n * sizeof(int)); 
     }
 
     // Gather sorted subarrays back to root process
     MPI_Gather(sub_data, local_n, MPI_INT, sorted, local_n, MPI_INT, 0, MPI_COMM_WORLD);
 
     if (rank == 0) {
-        // Final merge of the sorted chunks using OpenMP parallel merge sort
         #pragma omp parallel
         {
             #pragma omp single
             parallelMergeSort(sorted, 0, n - 1, 4);
         }
 
-        end_time = MPI_Wtime();  // End timing on rank 0
+        end_time = MPI_Wtime();  
 
         // Print first 10 elements for verification
         printf("Sorted array:\n");
@@ -137,9 +129,10 @@ int main(int argc, char *argv[]) {
     }
 
     free(sub_data);
-
-    // Finalize MPI environment
     MPI_Finalize();
 
     return 0;
 }
+
+
+// mpicc -fopenmp hybrid_merge_sort.c -o hybrid_merge_sort

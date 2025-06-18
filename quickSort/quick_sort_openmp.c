@@ -1,7 +1,4 @@
-/*
- * File: quick_sort_openmp.c
- * Description: Parallel Quick Sort using OpenMP with user input
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>

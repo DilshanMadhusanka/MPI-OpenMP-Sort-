@@ -1,7 +1,4 @@
-/*
- * File: quick_sort.c
- * Description: Sequential Quick Sort implementation with user input and execution time measurement
- */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
