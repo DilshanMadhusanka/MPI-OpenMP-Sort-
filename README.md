@@ -74,8 +74,5 @@ mpicc -fopenmp -o hybrid_quick_sort hybrid_quick_sort.c
 3. **Portability**: Works on any Linux cluster with MPI/OpenMP support
 4. **Extensibility**: Easy to add new algorithms (e.g., Radix Sort)
 
-### Would you like me to add:
-- Detailed algorithm explanations?
-- Sample input/output formats?
-- Benchmark results from your system?
+
 
